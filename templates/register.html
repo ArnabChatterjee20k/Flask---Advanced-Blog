@@ -12,60 +12,64 @@
             <div class="form-group my-2">
                 <!-- we are using the attributes name or variable names declared in the Registration form class in forms.py -->
                 <div class="form-group my-2">
-                    {{form.username.label(class="form-control-label is-invalid") }}
+                    {{form.username.label(class="form-control-label ") }}
                     <!-- catching errors in username -->
                     {% if form.username.errors %}
+                        {{form.username(class="form-control form-control-lg is-invalid") }}
                     <div class="invalid-feedback">
                         {% for error in form.username.errors %}
                         <span>{{ error }}</span>
                         {% endfor %}
                     </div>
                     {% else %}
-                    {{form.username(class="form-control form-control-lg") }}
+                        {{form.username(class="form-control form-control-lg") }}
                     <!-- html classes for field -->
                     {% endif %}
                 </div>
 
-                {{form.email.label(class="form-control-label is-invalid") }}
+                {{form.email.label(class="form-control-label ") }}
                 <!-- catching errors in email -->
                 {% if form.email.errors %}
+                    {{form.email(class="form-control form-control-lg is-invalid") }}
                 <div class="invalid-feedback">
                     {% for error in form.email.errors %}
                     <span>{{ error }}</span>
                     {% endfor %}
                 </div>
                 {% else %}
-                {{form.email(class="form-control form-control-lg") }}
+                    {{form.email(class="form-control form-control-lg") }}
                 <!-- html classes for field -->
                 {% endif %}
             </div>
 
             <div class="form-group my-2">
-                {{form.password.label(class="form-control-label is-invalid") }}
+                {{form.password.label(class="form-control-label ") }}
                 <!-- catching errors in password -->
                 {% if form.password.errors %}
+                    {{form.password(class="form-control form-control-lg is-invalid") }}
                 <div class="invalid-feedback">
                     {% for error in form.password.errors %}
                     <span>{{ error }}</span>
                     {% endfor %}
                 </div>
                 {% else %}
-                {{form.password(class="form-control form-control-lg") }}
+                    {{form.password(class="form-control form-control-lg") }}
                 <!-- html classes for field -->
                 {% endif %}
             </div>
 
             <div class="form-group my-2">
-                {{form.confirm_password.label(class="form-control-label is-invalid") }}
+                {{form.confirm_password.label(class="form-control-label ") }}
                 <!-- catching errors in confirm_password -->
                 {% if form.confirm_password.errors %}
+                    {{form.confirm_password(class="form-control form-control-lg is-invalid") }}
                 <div class="invalid-feedback">
                     {% for error in form.confirm_password.errors %}
                     <span>{{ error }}</span>
                     {% endfor %}
                 </div>
                 {% else %}
-                {{form.confirm_password(class="form-control form-control-lg") }}
+                    {{form.confirm_password(class="form-control form-control-lg") }}
                 <!-- html classes for field -->
                 {% endif %}
             </div>
