@@ -1,0 +1,63 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="content-section">
+    <form method="post">
+        <!-- form is the RegistrationForm object -->
+        <!-- it is for csrf token -->
+        {{
+        form.hidden_tag()
+        }}
+        <fieldset class="form-group">
+            <legend>Login</legend>
+            <div class="form-group my-2">
+                {{form.email.label(class="form-control-label ") }}
+                <!-- catching errors in email -->
+                {% if form.email.errors %}
+                    {{form.email(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.email.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    {{form.email(class="form-control form-control-lg") }}
+                <!-- html classes for field -->
+                {% endif %}
+            </div>
+
+            <div class="form-group my-2">
+                {{form.password.label(class="form-control-label ") }}
+                <!-- catching errors in password -->
+                {% if form.password.errors %}
+                    {{form.password(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.password.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    {{form.password(class="form-control form-control-lg") }}
+                <!-- html classes for field -->
+                {% endif %}
+            </div>
+
+        </fieldset>
+        <div class="form-check">
+            {{ form.remember(class="form-check-input") }}
+            {{ form.remember.label(class="form-check-label") }}
+        </div>
+        <div class="form-group my-2">
+            {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+        <small class="text-muted ml-2">
+            <a href="#">Forgotten Password?</a>
+        </small>
+    </form>
+    <div class="border-top pt-3 my-2">
+        <small class="text-muted">
+            Dont have account?
+            <a href="{{ url_for('register') }}">Sign Up</a>
+        </small>
+    </div>
+</div>
+{% endblock body %}
