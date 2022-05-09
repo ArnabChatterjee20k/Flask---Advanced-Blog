@@ -1,4 +1,3 @@
-from crypt import methods
 from flask import Flask, flash, redirect , render_template , url_for
 from forms import RegistrationForm , LoginForm
 
