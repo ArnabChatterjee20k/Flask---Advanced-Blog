@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <div class="content-section">
+        <form method="post">
+            <!-- form is the RegistrationForm object -->
+            <!-- it is for csrf token -->
+            {{
+                form.hidden_tag()
+            }}
+            <fieldset class="form-group">
+                <legend>Join Today</legend>
+                <div class="form-group my-2">
+                    <!-- we are using the attributes name or variable names declared in the Registration form class in forms.py -->
+                    {{form.username.label(class="form-control-label") }} <!-- html classes for label-->
+                    {{form.username(class="form-control form-control-lg") }} <!-- html classes for field -->
+                </div>
+                <div class="form-group my-2">
+                    {{form.email.label(class="form-control-label") }}<!-- html classes for label-->
+                    {{form.email(class="form-control form-control-lg") }}<!-- html classes for field -->
+                </div>
+                <div class="form-group my-2">
+                    {{form.password.label(class="form-control-label") }}<!-- html classes for label-->
+                    {{form.password(class="form-control form-control-lg") }}<!-- html classes for field -->
+                </div>
+                <div class="form-group my-2">
+                    {{form.confirm_password.label(class="form-control-label") }}<!-- html classes for label-->
+                    {{form.confirm_password(class="form-control form-control-lg") }}<!-- html classes for field -->
+                </div>
+            </fieldset>
+            <div class="form-group my-2">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+        <div class="border-top pt-3 my-2">
+            <small class="text-muted">
+                Already have an Account? 
+                <a href= "{{ url_for('login') }}">Sign In</a> 
+                <!-- login is the function of the route in blog.py -->
+            </small>
+        </div>
+    </div>
+{% endblock body %}
