@@ -3,7 +3,7 @@ from blog import app , db , bcrypt
 # as forms and models are a part of the blog package now
 from blog.forms import RegistrationForm , LoginForm
 from blog.models import User , Post
-from flask_login import login_user , current_user , logout_user
+from flask_login import login_user , current_user , logout_user , login_required
 
 posts = [
     {
@@ -39,6 +39,7 @@ posts = [
 ]
 
 @app.route("/")
+@login_required
 def home():
     return render_template("home.html",post = posts)
 
@@ -83,3 +84,8 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for("login"))
+
+@app.route("/account")
+@login_required
+def account():
+    return render_template("account.html",title="Account")

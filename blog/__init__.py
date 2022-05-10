@@ -11,6 +11,9 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///site.db" # here /// means the
 db = SQLAlchemy(app)
 bcrypt = Bcrypt()
 login_manager = LoginManager(app)
+# to tell log_manager where our login route is located. Specially required for login_required function
+login_manager.login_view = "login" # function name of the login route
+login_manager.login_message_category = "info"
 
 # to avoid the circular imports we will import it after db initialisation
 from blog import routes
