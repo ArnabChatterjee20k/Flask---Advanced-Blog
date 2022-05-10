@@ -1,5 +1,5 @@
 from flask import flash, redirect , render_template , url_for
-from blog import app
+from blog import app , db , bcrypt
 # as forms and models are a part of the blog package now
 from blog.forms import RegistrationForm , LoginForm
 from blog.models import User , Post
@@ -49,8 +49,12 @@ def about():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
+        user = User(username=form.username.data , email = form.email.data , password=hashed_password)
+        db.session.add(user)
+        db.session.commit()
         flash(f"Account created for {form.username.data}",category="success")
-        return redirect(url_for("home")) # home is the function of the home route
+        return redirect(url_for("login")) # home is the function of the home route
 
     return render_template("register.html",form=form,title="Register")
 
