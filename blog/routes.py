@@ -1,14 +1,8 @@
-from flask import Flask, flash, redirect , render_template , url_for
-from forms import RegistrationForm , LoginForm
-from flask_sqlalchemy import SQLAlchemy
-app = Flask(__name__) # name means name of this module which is main
-
-app.config["SECRET_KEY"] = '761f9d132273fe311f3e13be9faa56b6'
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///site.db" # here /// means the relative path which address the folder
-
-db = SQLAlchemy(app)
-from models import User , Post
-
+from flask import flash, redirect , render_template , url_for
+from blog import app
+# as forms and models are a part of the blog package now
+from blog.forms import RegistrationForm , LoginForm
+from blog.models import User , Post
 
 posts = [
     {
@@ -70,6 +64,3 @@ def login():
         else:
             flash(f"Log in Unsuccessfull",category="danger")
     return render_template("login.html",form=form,title="Login")
-
-if __name__ == "__main__":
-    app.run(debug=True)

@@ -1,4 +1,4 @@
-from __main__ import db
+from blog import db # no main now blog package only
 from datetime import datetime
 # One to Many relationship from User to Post as an User can have many posts
 # In User we are referencing the Post class so capital Post
