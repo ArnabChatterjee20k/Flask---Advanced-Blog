@@ -3,7 +3,7 @@ from blog import app , db , bcrypt
 # as forms and models are a part of the blog package now
 from blog.forms import RegistrationForm , LoginForm
 from blog.models import User , Post
-from flask_login import login_user , current_user
+from flask_login import login_user , current_user , logout_user
 
 posts = [
     {
@@ -78,3 +78,8 @@ def login():
         else:
             flash(f"Log in Unsuccessfull",category="danger")
     return render_template("login.html",form=form,title="Login")
+
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
