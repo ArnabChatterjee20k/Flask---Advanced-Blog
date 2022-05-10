@@ -1,4 +1,4 @@
-from flask import flash, redirect , render_template , url_for
+from flask import flash, redirect , render_template , url_for , request
 from blog import app , db , bcrypt
 # as forms and models are a part of the blog package now
 from blog.forms import RegistrationForm , LoginForm
@@ -74,8 +74,15 @@ def login():
         if user and bcrypt.check_password_hash(user.password , form.password.data): # hashed_password in the database and the submiited password
             # logging user using login_user function
             login_user(user=user , remember=form.remember.data)
+            """
+                Now when user is not logged in and tries to get to a route then it is present in the url as next.
+                http://127.0.0.1:5000/login?next=%2F like this.
+                So we can grab it to redirect the user where he wants after login
+            """
+            next_page = request.args.get("next") # next arg may or may not be present
             flash(f"Log in successfull",category="success")
-            return redirect(url_for("home"))
+            # ternary conditional
+            return redirect(next_page) if next_page else redirect(url_for("home"))
         else:
             flash(f"Log in Unsuccessfull",category="danger")
     return render_template("login.html",form=form,title="Login")
