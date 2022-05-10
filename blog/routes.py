@@ -3,6 +3,7 @@ from blog import app , db , bcrypt
 # as forms and models are a part of the blog package now
 from blog.forms import RegistrationForm , LoginForm
 from blog.models import User , Post
+from flask_login import login_user , current_user
 
 posts = [
     {
@@ -47,6 +48,9 @@ def about():
 
 @app.route("/register",methods=['GET','POST'])
 def register():
+    if current_user.is_authenticated:
+        flash("Already logged in..",category="warning")
+        return redirect(url_for("home"))
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode("utf-8")
@@ -60,10 +64,16 @@ def register():
 
 @app.route("/login",methods=['GET','POST'])
 def login():
+    if current_user.is_authenticated:
+        flash("Already logged in..",category="warning")
+        return redirect(url_for("home"))
     form = LoginForm()
     if form.validate_on_submit():
-        if form.email.data=="arnabchatterjee.ac@gmail.com" and form.password.data=="1234":
-            flash(f"Logged in as {form.email.data}",category="success")
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and bcrypt.check_password_hash(user.password , form.password.data): # hashed_password in the database and the submiited password
+            # logging user using login_user function
+            login_user(user=user , remember=form.remember.data)
+            flash(f"Log in successfull",category="success")
             return redirect(url_for("home"))
         else:
             flash(f"Log in Unsuccessfull",category="danger")
