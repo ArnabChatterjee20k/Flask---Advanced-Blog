@@ -1,7 +1,7 @@
 from flask import flash, redirect , render_template , url_for , request
 from blog import app , db , bcrypt
 # as forms and models are a part of the blog package now
-from blog.forms import RegistrationForm , LoginForm
+from blog.forms import RegistrationForm , LoginForm , UpdateAccountForm
 from blog.models import User , Post
 from flask_login import login_user , current_user , logout_user , login_required
 
@@ -92,7 +92,19 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
-@app.route("/account")
+@app.route("/account",methods=['GET',"POST"])
 @login_required
 def account():
-    return render_template("account.html",title="Account")
+    form = UpdateAccountForm()
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        db.session.commit()
+        flash("Account Updated!","success")
+        return redirect(url_for("account"))
+    elif request.method == "GET":
+        # setting form values to current user data values so that they are filled up on starting automatically
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+    image_file = url_for("static",filename=current_user.image_file)
+    return render_template("account.html",title="Account", image_file = image_file , form=form)
