@@ -1,4 +1,5 @@
 import secrets , os
+from PIL import Image
 from flask import flash, redirect , render_template , url_for , request
 from blog import app , db , bcrypt
 # as forms and models are a part of the blog package now
@@ -104,7 +105,13 @@ def save_picture(form_picture):
     _ , f_ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext # new randomised name of the picture
     picture_path = os.path.join(app.root_path , "static/" , picture_fn) # getting the full path
-    form_picture.save(picture_path) # saving our picture
+
+    # resizing the Picture
+    output_size = (125,125)
+    image = Image.open(form_picture)
+    image.thumbnail(output_size)
+
+    image.save(picture_path) # saving our resized picture
 
     return picture_fn
 
