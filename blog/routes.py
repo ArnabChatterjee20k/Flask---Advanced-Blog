@@ -1,3 +1,4 @@
+import secrets , os
 from flask import flash, redirect , render_template , url_for , request
 from blog import app , db , bcrypt
 # as forms and models are a part of the blog package now
@@ -92,11 +93,31 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
+
+def save_picture(form_picture):
+    """ For saving the picture into the file and randomising the name of the picture data """
+    random_hex= secrets.token_hex(8)
+    """ 
+        splitting the filename using os module to get the file extension
+        then join it with root path of our app using app.root_path and os.path.join
+    """
+    _ , f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext # new randomised name of the picture
+    picture_path = os.path.join(app.root_path , "static/" , picture_fn) # getting the full path
+    form_picture.save(picture_path) # saving our picture
+
+    return picture_fn
+
 @app.route("/account",methods=['GET',"POST"])
 @login_required
 def account():
     form = UpdateAccountForm()
     if form.validate_on_submit():
+        if form.picture.data:
+            # if picture file present then update the file.
+            picture_file = save_picture(form.picture.data)
+            current_user.image_file = picture_file
+            db.session.commit()
         current_user.username = form.username.data
         current_user.email = form.email.data
         db.session.commit()
