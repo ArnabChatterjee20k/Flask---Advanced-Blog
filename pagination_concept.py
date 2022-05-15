@@ -1,4 +1,5 @@
 from blog.models import db , User , Post
+from blog.routes import post
 def basics_concept():
     post = Post.query.paginate()
     # 'Pagination' object is not iterable
@@ -36,4 +37,10 @@ def setting_both():
     for item in post.items:
         print(item)
 
-basics_concept()
+def get_navigate_pages():
+    # getting page numbers
+    post = Post.query.paginate(per_page=2,page=2)
+    for page in post.iter_pages():
+        print(page) # None value representing to the
+
+get_navigate_pages()
