@@ -16,5 +16,16 @@ Home
       <p class="article-content">{{ post.content }}</p>
     </div>
   </article>
-{% endfor %}
+  {% endfor %}
+  {% for page_number in post.iter_pages(left_edge=1,right_edge=1,left_current=1,right_current=2) %}
+    {% if page_number %}
+      {% if post.page == page_number  %}
+        <a class="btn btn-info mb-4" href="{{ url_for('home', page=page_number) }}">{{ page_number }}</a>
+      {% else %}
+        <a class="btn btn-outline-info mb-4" href="{{ url_for('home', page=page_number) }}">{{ page_number }}</a>
+      {% endif %}
+      {% else %}
+        ...
+    {% endif %}
+  {% endfor %}
 {% endblock body %}
