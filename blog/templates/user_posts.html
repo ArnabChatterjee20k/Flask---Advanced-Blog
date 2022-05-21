@@ -1,6 +1,8 @@
 {% extends 'layout.html' %}
 {% block body %}
-Home
+<h1 class="mb-3">
+    Posts by {{ user.username }} ({{ post.total }})
+</h1>
 {% for post in post.items %}
 <article class="media content-section">
   <img class="rounded-circle article-img" src="{{ url_for('static', filename= post.author.image_file ) }}" alt="">
@@ -20,9 +22,9 @@ Home
   {% for page_number in post.iter_pages(left_edge=1,right_edge=1,left_current=1,right_current=2) %}
     {% if page_number %}
       {% if post.page == page_number  %}
-        <a class="btn btn-info mb-4" href="{{ url_for('home', page=page_number) }}">{{ page_number }}</a>
+        <a class="btn btn-info mb-4" href="{{ url_for('user_posts',username=user.username ,page=page_number) }}">{{ page_number }}</a>
       {% else %}
-        <a class="btn btn-outline-info mb-4" href="{{ url_for('home', page=page_number) }}">{{ page_number }}</a>
+        <a class="btn btn-outline-info mb-4" href=href="{{ url_for('user_posts',username=user.username ,page=page_number) }}">{{ page_number }}</a>
       {% endif %}
       {% else %}
         ...
