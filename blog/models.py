@@ -1,6 +1,8 @@
-from blog import db , login_manager # no main now blog package only
+from blog import db , login_manager , app # no main now blog package only
 from datetime import datetime
 from flask_login import UserMixin # to use the commonly used methods.
+from itsdangerous import URLSafeTimedSerializer
+
 
 """ user_loader callback. This callback is used to reload the user object from the user ID stored in the session"""
 @login_manager.user_loader
@@ -21,6 +23,17 @@ class User(db.Model , UserMixin):
     # we can use author in the post table to get the user data
     # also we can use user.posts to get the user posts
 
+    def get_reset_token(self):
+        serialiser = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+        return serialiser.dumps({"user_id":self.id})
+    @staticmethod
+    def verify_reset_token(token,expires_sec=1800):
+        serialiser = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+        try:
+            user_id = serialiser.loads(token,max_age=expires_sec)["user_id"]
+        except:
+            return None
+        return User.query.get(user_id)
     def __repr__(self) :
         return f"User {self.username} , {self.email} , {self.image_file}"
 
