@@ -1,26 +1,19 @@
-import secrets , os
-from PIL import Image
-from flask import abort, flash, redirect , render_template , url_for , request
-from blog import app , db , bcrypt , mail
-# as forms and models are a part of the blog package now
-from blog.forms import RegistrationForm , LoginForm , UpdateAccountForm , PostForm , RequestResetForm , ResetPasswordForm
-from blog.models import User , Post
-from flask_login import login_user , current_user , logout_user , login_required
-from flask_mail import Message
 
-@app.route("/")
-@login_required
-def home():
-    page = request.args.get("page",default=1 , type=int)
-    number_of_posts_per_page = 5
-    posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page,per_page=number_of_posts_per_page)
-    return render_template("home.html",post = posts)
+from flask import Blueprint
 
-@app.route("/about")
-def about():
-    return render_template("about.html",title="about")
+from flask import render_template, url_for, flash, redirect, request, Blueprint
+from flask_login import login_user, current_user, logout_user, login_required
+from blog import db, bcrypt
+from blog.models import User, Post
+from blog.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
+                                   RequestResetForm, ResetPasswordForm)
+from blog.users.utils import save_picture, send_reset_email
 
-@app.route("/register",methods=['GET','POST'])
+users = Blueprint("users",__name__) # like creating instance of flask object
+
+# we will not use app anymore we will use users blueprint and later register
+
+@users.route("/register",methods=['GET','POST'])
 def register():
     if current_user.is_authenticated:
         flash("Already logged in..",category="warning")
@@ -36,7 +29,7 @@ def register():
 
     return render_template("register.html",form=form,title="Register")
 
-@app.route("/login",methods=['GET','POST'])
+@users.route("/login",methods=['GET','POST'])
 def login():
     if current_user.is_authenticated:
         flash("Already logged in..",category="warning")
@@ -60,33 +53,12 @@ def login():
             flash(f"Log in Unsuccessfull",category="danger")
     return render_template("login.html",form=form,title="Login")
 
-@app.route("/logout")
+@users.route("/logout")
 def logout():
     logout_user()
     return redirect(url_for("login"))
 
-
-def save_picture(form_picture):
-    """ For saving the picture into the file and randomising the name of the picture data """
-    random_hex= secrets.token_hex(8)
-    """ 
-        splitting the filename using os module to get the file extension
-        then join it with root path of our app using app.root_path and os.path.join
-    """
-    _ , f_ext = os.path.splitext(form_picture.filename)
-    picture_fn = random_hex + f_ext # new randomised name of the picture
-    picture_path = os.path.join(app.root_path , "static/" , picture_fn) # getting the full path
-
-    # resizing the Picture
-    output_size = (125,125)
-    image = Image.open(form_picture)
-    image.thumbnail(output_size)
-
-    image.save(picture_path) # saving our resized picture
-
-    return picture_fn
-
-@app.route("/account",methods=['GET',"POST"])
+@users.route("/account",methods=['GET',"POST"])
 @login_required
 def account():
     form = UpdateAccountForm()
@@ -108,63 +80,7 @@ def account():
     image_file = url_for("static",filename=current_user.image_file)
     return render_template("account.html",title="Account", image_file = image_file , form=form)
 
-
-@app.route("/post/new",methods=["GET","POST"])
-@login_required
-def new_post():
-    form = PostForm()
-    if form.validate_on_submit():
-        post = Post(title = form.title.data , 
-                    content = form.content.data , 
-                    author = current_user) # author is the backref in the user table which links to all data in post. 
-                                           # here author is declared to current user means all the details.
-        db.session.add(post)
-        db.session.commit()
-        flash("Post created","success")
-        return redirect(url_for("home"))
-    return render_template("create_post.html", form = form ,
-                            title="New post" , 
-                            legend="New Post"
-                            )
-
-@app.route("/post/<int:post_id>",methods=["GET","POST"])
-def post(post_id):
-    post = Post.query.get_or_404(post_id)
-    return render_template("post.html",title=post.title,post=post)
-
-@app.route("/post/<int:post_id>/update",methods=["GET","POST"])
-@login_required
-def update_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    if post.author != current_user:
-        abort(403)
-    form = PostForm()
-    if form.validate_on_submit():
-        # updating the post
-        post.title = form.title.data
-        post.content = form.content.data
-        db.session.commit()
-        flash("Post udpated","success")
-        return redirect(url_for("home"))
-    elif request.method == "GET":
-        form.title.data = post.title
-        form.content.data = post.content
-    return render_template("create_post.html", form = form ,
-                            title="Update post" , 
-                            legend = "Update post")
-
-@app.route("/post/<int:post_id>/delete",methods=["POST"])
-@login_required
-def delete_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    if post.author != current_user:
-        abort(403)
-    db.session.delete(post)
-    db.session.commit()
-    flash("Post deleted","warning")
-    return redirect(url_for("home"))
-
-@app.route("/user/<string:username>")
+@users.route("/user/<string:username>")
 @login_required
 def user_posts(username):
     page = request.args.get("page",default=1 , type=int)
@@ -177,21 +93,7 @@ def user_posts(username):
     
     return render_template("user_posts.html",user=user,post = posts)
 
-
-def send_reset_email(user):
-    token = user.get_reset_token()
-    msg = Message("Password Reset Request",
-                    sender="noreply@demo.com",
-                    recipients=[user.email])
-    msg.body = f"""
-                    To reset your password , visit the following the link:-
-                    {url_for("reset_token",token=token,_external=True)}
-                """ #_external for absolute path
-
-    mail.send(msg)
-    return
-
-@app.route("/reset_password",methods=["GET","POST"])
+@users.route("/reset_password",methods=["GET","POST"])
 def reset_request():
     if current_user.is_authenticated:
         return redirect(url_for("home"))
@@ -204,7 +106,7 @@ def reset_request():
     return render_template("reset_password.html",title="Reset Password",form = form)
 
 
-@app.route("/reset_password/<token>",methods=["GET","POST"])
+@users.route("/reset_password/<token>",methods=["GET","POST"])
 def reset_token(token):
 
     if current_user.is_authenticated:

@@ -24,5 +24,12 @@ app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")
 app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
 mail = Mail(app)
 
-# to avoid the circular imports we will import it after db initialisation
-from blog import routes
+# importing blueprints
+from blog.users.routes import users
+from blog.post.routes import posts
+from blog.main.routes import main
+
+# registering imported blueprints
+app.register_blueprint(users)
+app.register_blueprint(posts)
+app.register_blueprint(main)
